@@ -7,7 +7,17 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Udacity - jose.morales@udacity.com",
+  "contributors": [
+    {
+      "name": "Santiago Garcia Belmonte",
+      "email": "sangarbe@gmail.com",
+      "url": "https://github.com/sangarbe"
+    }
+  ],
   "license": "ISC",
+  "engines": {
+    "node": "^16.13.2"
+  },
   "dependencies": {
     "bitcoinjs-lib": "^4.0.3",
     "bitcoinjs-message": "^2.0.0",
