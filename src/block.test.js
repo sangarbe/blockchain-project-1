@@ -31,4 +31,15 @@ describe("Block", () => {
     block.height = block.height + 1;
     expect(await block.validate()).toBe(false);
   })
+
+  it("should get decoded block data", async () => {
+    let data = {data: ["dummy data"]};
+    const block = new Block(data);
+    block.height = 1;
+
+    expect(await block.getBData()).toEqual(data);
+
+    block.height = 0;
+    await expect(block.getBData()).rejects.toThrowError("can't get genesis block data")
+  })
 })
