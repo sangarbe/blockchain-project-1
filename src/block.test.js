@@ -1,23 +1,21 @@
 const {Block} = require("./block");
+const SHA256 = require("crypto-js/sha256");
 
 
 describe("Block", () => {
-  it("should calculate hash", () => {
+  it("should calculate hash without update", () => {
     const block = new Block("dummy");
-    expect(block.hash).toBeNull()
+    const hash = block.calculateHash();
 
-    block.calculateHash();
-    expect(block.hash).not.toBeNull()
+    expect(hash).toBe(SHA256(JSON.stringify(block)).toString());
+    expect(block.hash).toBeNull();
   })
 
-  it("should not recalculate previous hash", () => {
+  it("should calculate hash and update", () => {
     const block = new Block("dummy");
-    block.calculateHash();
-    expect(block.hash).not.toBeNull()
+    const hash = block.calculateHash(true);
 
-    const expected = block.hash;
-    block.calculateHash();
-    expect(block.hash).toEqual(expected);
+    expect(block.hash).toBe(hash);
   })
 
   it("should validate", async () => {
@@ -25,7 +23,7 @@ describe("Block", () => {
 
     expect(await block.validate()).toBe(false);
 
-    block.calculateHash();
+    block.hash = block.calculateHash();
     expect(await block.validate()).toBe(true);
 
     block.height = block.height + 1;
@@ -44,6 +42,6 @@ describe("Block", () => {
     expect(await block.getBData()).toEqual(star);
 
     block.height = 0;
-    await expect(block.getBData()).rejects.toThrowError("can't get genesis block data")
+    await expect(block.getBData()).rejects.toThrowError("can't get genesis block data");
   })
 })

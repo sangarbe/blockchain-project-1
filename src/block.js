@@ -35,9 +35,7 @@ class Block {
    *  Note: to access the class values inside a Promise code you need to create an auxiliary value `let self = this;`
    */
   async validate() {
-    const clone = this._clone().calculateHash();
-
-    return this.hash === clone.hash;
+    return this.hash === this.calculateHash();
   }
 
   /**
@@ -50,7 +48,7 @@ class Block {
    *     or Reject with an error.
    */
   async getBData() {
-    if(this.height === 0){
+    if (this.height === 0) {
       throw new Error("can't get genesis block data");
     }
 
@@ -58,14 +56,19 @@ class Block {
   }
 
   /**
-   *  calculateHash() calculates the hash of a block if not already calculated.
+   *  calculateHash() returns the hash of a block if not already calculated.
    */
-  calculateHash() {
-    if (this.hash === null) {
-      this.hash = SHA256(JSON.stringify(this)).toString();
+  calculateHash(mustUpdate) {
+    mustUpdate = !!mustUpdate;
+
+    const cloned = this._clone();
+    const hash = SHA256(JSON.stringify(cloned)).toString();
+
+    if (mustUpdate) {
+      this.hash = hash;
     }
 
-    return this;
+    return hash;
   }
 
   /**
