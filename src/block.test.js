@@ -33,11 +33,15 @@ describe("Block", () => {
   })
 
   it("should get decoded block data", async () => {
-    let data = {data: ["dummy data"]};
-    const block = new Block(data);
+    const star = {
+      dec: "68° 52' 56.9",
+      ra: "16h 29m 1.0s",
+      story: "Testing star"
+    };
+    const block = new Block(star);
     block.height = 1;
 
-    expect(await block.getBData()).toEqual(data);
+    expect(await block.getBData()).toEqual(star);
 
     block.height = 0;
     await expect(block.getBData()).rejects.toThrowError("can't get genesis block data")

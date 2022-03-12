@@ -10,7 +10,6 @@
  */
 
 const SHA256 = require('crypto-js/sha256');
-const hex2ascii = require('hex2ascii');
 
 class Block {
 
@@ -55,7 +54,7 @@ class Block {
       throw new Error("can't get genesis block data");
     }
 
-    return JSON.parse(hex2ascii(this.body));
+    return JSON.parse(Buffer.from(this.body, 'hex').toString());
   }
 
   /**
