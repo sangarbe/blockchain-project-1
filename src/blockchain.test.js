@@ -158,12 +158,26 @@ describe("Blockchain", () => {
     await blockchain.submitStar(btcAddress, message, signature, star);
     await blockchain.submitStar(btcAddress, message, signature, star);
 
+    // not tampered yet so is valid
     let errors = await blockchain.validateChain();
     expect(errors).toEqual([]);
 
-    blockchain.chain[2].time = now + 1;
+    // tamper block 2
+    const b2Time = blockchain.chain[2].time;
+    blockchain.chain[2].time++;
+
+    // tampered so invalid from block 2
     errors = await blockchain.validateChain();
     expect(errors).toEqual(["block 2 is invalid", "block 3 is invalid"]);
+
+    // consecutive validation still same result
+    errors = await blockchain.validateChain();
+    expect(errors).toEqual(["block 2 is invalid", "block 3 is invalid"]);
+
+    // block 2 back to normal so valid again
+    blockchain.chain[2].time = b2Time;
+    errors = await blockchain.validateChain();
+    expect(errors).toEqual([]);
 
     Date.now = originalNow;
   })

@@ -191,16 +191,16 @@ class Blockchain {
    */
   async validateChain() {
     const errorLog = [];
+    let prevHash = null;
     for (let i = 0; i < this.chain.length; i++) {
       const block = this.chain[i];
-      if (i > 0) {
-        block.previousBlockHash = this.chain[i - 1].hash
-      }
+      block.previousBlockHash = prevHash;
+      prevHash = block.hash;
 
       const valid = await block.validate();
       if (!valid) {
+        prevHash = block.calculateHash();
         errorLog.push(`block ${i} is invalid`);
-        block.calculateHash(true);
       }
     }
 
