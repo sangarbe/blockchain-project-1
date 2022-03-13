@@ -64,6 +64,11 @@ class Blockchain {
    * that this method is a private method.
    */
   async _addBlock(block) {
+    const chainErrors = await this.validateChain();
+    if(chainErrors.length > 0){
+      throw new Error(`chain invalid: ${chainErrors[0]}`);
+    }
+
     block.height = this.height + 1;
     block.time = Date.now().toString().slice(0, -3);
     if (this.height >= 0) {
