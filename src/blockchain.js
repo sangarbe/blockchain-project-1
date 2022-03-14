@@ -8,7 +8,6 @@
  *
  */
 
-const SHA256 = require('crypto-js/sha256');
 const {Block} = require('./block.js');
 const bitcoinMessage = require('bitcoinjs-message');
 
@@ -45,10 +44,8 @@ class Blockchain {
   /**
    * Utility method that return a Promise that will resolve with the height of the chain
    */
-  getChainHeight() {
-    return new Promise((resolve, reject) => {
-      resolve(this.height);
-    });
+  async getChainHeight() {
+    return this.height;
   }
 
   /**
@@ -65,7 +62,7 @@ class Blockchain {
    */
   async _addBlock(block) {
     const chainErrors = await this.validateChain();
-    if(chainErrors.length > 0){
+    if (chainErrors.length > 0) {
       throw new Error(`chain invalid: ${chainErrors[0]}`);
     }
 
@@ -146,7 +143,7 @@ class Blockchain {
    * @param {*} hash
    */
   async getBlockByHash(hash) {
-    return this.chain.filter(b => b.hash === hash)[0] || null;
+    return this.chain.find(b => b.hash === hash) || null;
   }
 
   /**
@@ -154,16 +151,8 @@ class Blockchain {
    * with the height equal to the parameter `height`
    * @param {*} height
    */
-  getBlockByHeight(height) {
-    let self = this;
-    return new Promise((resolve, reject) => {
-      let block = self.chain.filter(p => p.height === height)[0];
-      if (block) {
-        resolve(block);
-      } else {
-        resolve(null);
-      }
-    });
+  async getBlockByHeight(height) {
+      return this.chain.find(p => p.height === height) || null;
   }
 
   /**
@@ -196,15 +185,18 @@ class Blockchain {
    */
   async validateChain() {
     const errorLog = [];
-    let prevHash = null;
     for (let i = 0; i < this.chain.length; i++) {
-      const block = this.chain[i];
-      block.previousBlockHash = prevHash;
-      prevHash = block.hash;
-
-      const valid = await block.validate();
+      const valid = await this.chain[i].validate();
       if (!valid) {
-        prevHash = block.calculateHash();
+        errorLog.push(`block ${i} is invalid`);
+        continue;
+      }
+
+      if (i === 0) {
+        continue;
+      }
+
+      if (this.chain[i].previousBlockHash !== this.chain[i - 1].calculateHash()) {
         errorLog.push(`block ${i} is invalid`);
       }
     }
