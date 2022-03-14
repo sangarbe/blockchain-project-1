@@ -120,7 +120,7 @@ class BlockchainController {
 
     // This endpoint allows you to retrieve the list of errors detected through blockchain validation
     getBlockchainErrors() {
-        this.app.get("/blockchainErrors", async (req, res) => {
+        this.app.get("/validateChain", async (req, res) => {
             try {
                 const errors = await this.blockchain.validateChain();
                 return res.status(200).json(errors);
